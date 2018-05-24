@@ -35,11 +35,28 @@ public class MyContentProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] strings1, @Nullable String s1) {
+    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         int uriType = uriMatcher.match(uri);
         SQLiteDatabase smartphoneDatabase = databaseHelper.getReadableDatabase();
+        Cursor cursor = null;
+
+        switch (uriType){
+            case WHOLE_TABLE:
+                cursor = smartphoneDatabase.query(false,DatabaseHelper.SMARTPHONE_TABLE,projection,selection,selectionArgs,null,null,sortOrder,null,null);
+                break;
+            case CHOSEN_RAW:
+                cursor = smartphoneDatabase.query(false,DatabaseHelper.SMARTPHONE_TABLE,projection,getSelectionWithId(uri,selection),selectionArgs,null,null,sortOrder,null,null);
+                break;
+        }
     }
 
+    private String getSelectionWithId(Uri uri,String selection){
+        if(selection != null){
+            selection += " and " + DatabaseHelper.ID + " = " + uri.getLastPathSegment();
+        }else{
+            selection += DatabaseHelper.ID + " = " + uri.getLastPathSegment();
+        }
+    }
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
@@ -65,8 +82,21 @@ public class MyContentProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        int uriType = uriMatcher.match(uri);
+        SQLiteDatabase smartphoneDatabase = databaseHelper.getWritableDatabase();
+        int numOfDeletedRecords = 0;
+
+        switch (uriType){
+            case WHOLE_TABLE:
+                numOfDeletedRecords = smartphoneDatabase.delete(DatabaseHelper.SMARTPHONE_TABLE,selection, selectionArgs);
+                break;
+            case CHOSEN_RAW:
+                numOfDeletedRecords = smartphoneDatabase.delete(DatabaseHelper.SMARTPHONE_TABLE,getSelectionWithId(uri,selection),selectionArgs);
+                break;
+            default:
+                throw new IllegalArgumentException("Nieprawidłowe uri: " + uri);
+        }
     }
 
     @Override
