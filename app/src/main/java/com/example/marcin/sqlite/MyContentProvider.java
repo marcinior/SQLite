@@ -30,6 +30,7 @@ public class MyContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
+        databaseHelper = new DatabaseHelper(getContext());
         return false;
     }
 
@@ -37,7 +38,7 @@ public class MyContentProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         int uriType = uriMatcher.match(uri);
-        SQLiteDatabase smartphoneDatabase = databaseHelper.getReadableDatabase();
+        SQLiteDatabase smartphoneDatabase = databaseHelper.getWritableDatabase();
         Cursor cursor = null;
 
         switch (uriType){
@@ -48,14 +49,18 @@ public class MyContentProvider extends ContentProvider {
                 cursor = smartphoneDatabase.query(false,DatabaseHelper.SMARTPHONE_TABLE,projection,getSelectionWithId(uri,selection),selectionArgs,null,null,sortOrder,null,null);
                 break;
         }
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return cursor;
     }
 
     private String getSelectionWithId(Uri uri,String selection){
-        if(selection != null){
-            selection += " and " + DatabaseHelper.ID + " = " + uri.getLastPathSegment();
+        if(selection != null && !selection.equals("")){
+            selection += " and " + DatabaseHelper.ID + "=" + uri.getLastPathSegment();
         }else{
-            selection += DatabaseHelper.ID + " = " + uri.getLastPathSegment();
+            selection = DatabaseHelper.ID + "=" + uri.getLastPathSegment();
         }
+
+        return selection;
     }
     @Nullable
     @Override
@@ -97,10 +102,27 @@ public class MyContentProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Nieprawidłowe uri: " + uri);
         }
+        return numOfDeletedRecords;
     }
 
     @Override
-    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String selection, @Nullable String[] selectionArgs) {
+        int uriType = uriMatcher.match(uri);
+        SQLiteDatabase smartphoneDatabase = databaseHelper.getWritableDatabase();
+        int numOfUpdatedRecords = 0;
+
+        switch (uriType){
+            case WHOLE_TABLE:
+                numOfUpdatedRecords = smartphoneDatabase.update(DatabaseHelper.SMARTPHONE_TABLE,contentValues,selection,selectionArgs);
+                break;
+            case CHOSEN_RAW:
+                numOfUpdatedRecords = smartphoneDatabase.update(DatabaseHelper.SMARTPHONE_TABLE,contentValues,getSelectionWithId(uri,selection),selectionArgs);
+                break;
+            default:
+                throw new IllegalArgumentException("Nieprawidłowe uri : " + uri);
+        }
+
+        getContext().getContentResolver().notifyChange(uri,null);
+        return numOfUpdatedRecords;
     }
 }

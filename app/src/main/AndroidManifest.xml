@@ -9,6 +9,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <provider
+            android:authorities="com.example.marcin.sqlite.MyContentProvider"
+            android:name="MyContentProvider"
+            android:enabled="true"
+            android:exported="true">
+        </provider>
         <activity android:name=".PhoneDatabase">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

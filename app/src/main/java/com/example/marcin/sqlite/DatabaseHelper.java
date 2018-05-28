@@ -10,8 +10,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public final static int DATABASE_VERSION = 1;
-    public final static String ID = "id";
-    public final static String DATABASE_NAME = "SartphoneDatabase";
+    public final static String ID = "_id";
+    public final static String DATABASE_NAME = "SmartphoneDatabase";
     public final static String SMARTPHONE_TABLE = "smartphone";
     public final static String PRODUCER = "producer";
     public final static String MODEL = "model";
@@ -19,10 +19,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public final static String WWW = "www";
 
     public final static String CREATE_TABLE_SMARTPHONES = "CREATE TABLE " + SMARTPHONE_TABLE +
-                                                                "(" + ID + " int not null autoincrement, " +
+                                                                "(" + ID + " integer primary key autoincrement , " +
                                                                 PRODUCER + " text not null, " +
                                                                 MODEL + " text not null, " +
-                                                                ANDROID_VERSION + " text not null" +
+                                                                ANDROID_VERSION + " text not null, " +
                                                                 WWW + " text not null);";
     private final static String DROP_TABLE_SMARTPHONE = "DROP TABLE IF EXISTS " + SMARTPHONE_TABLE;
 
