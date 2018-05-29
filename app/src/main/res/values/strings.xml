@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">SQLite</string>
+    <string name="app_name">Baza telefonów</string>
+    <string name="context_bar_name">Usuń</string>
 </resources>

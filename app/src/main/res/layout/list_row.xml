@@ -3,16 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/TableLayout">
-    <TableRow>
+    <TableRow
+        android:background="@drawable/background_color"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
         <TextView
             android:id="@+id/producerTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
+            android:paddingLeft="10dp"
+            android:layout_marginRight="100dp"
             android:layout_column="0"/>
         <TextView
             android:id="@+id/modelTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:layout_column="1"/>

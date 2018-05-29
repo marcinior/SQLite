@@ -10,18 +10,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <provider
+            android:name=".MyContentProvider"
             android:authorities="com.example.marcin.sqlite.MyContentProvider"
-            android:name="MyContentProvider"
             android:enabled="true"
-            android:exported="true">
-        </provider>
-        <activity android:name=".PhoneDatabase">
+            android:exported="true"></provider>
+
+        <activity android:name=".PhoneListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".AddNewPhoneActivity"></activity>
     </application>
 
 </manifest>

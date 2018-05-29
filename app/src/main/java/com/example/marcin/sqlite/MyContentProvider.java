@@ -9,8 +9,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.net.URI;
-
 /**
  * Created by marcin on 24.05.18.
  */
@@ -20,12 +18,12 @@ public class MyContentProvider extends ContentProvider {
     private static final String AUTHORITY = "com.example.marcin.sqlite.MyContentProvider";
     public static final Uri URI_SMARTPHONE_TABLE = Uri.parse("content://" + AUTHORITY + "/" + DatabaseHelper.SMARTPHONE_TABLE);
     private static final int WHOLE_TABLE = 1;
-    private static final int CHOSEN_RAW = 2;
+    private static final int CHOSEN_ROW = 2;
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
         uriMatcher.addURI(AUTHORITY,DatabaseHelper.SMARTPHONE_TABLE,WHOLE_TABLE);
-        uriMatcher.addURI(AUTHORITY,DatabaseHelper.SMARTPHONE_TABLE + "/#", CHOSEN_RAW);
+        uriMatcher.addURI(AUTHORITY,DatabaseHelper.SMARTPHONE_TABLE + "/#", CHOSEN_ROW);
     }
 
     @Override
@@ -45,7 +43,7 @@ public class MyContentProvider extends ContentProvider {
             case WHOLE_TABLE:
                 cursor = smartphoneDatabase.query(false,DatabaseHelper.SMARTPHONE_TABLE,projection,selection,selectionArgs,null,null,sortOrder,null,null);
                 break;
-            case CHOSEN_RAW:
+            case CHOSEN_ROW:
                 cursor = smartphoneDatabase.query(false,DatabaseHelper.SMARTPHONE_TABLE,projection,getSelectionWithId(uri,selection),selectionArgs,null,null,sortOrder,null,null);
                 break;
         }
@@ -76,7 +74,7 @@ public class MyContentProvider extends ContentProvider {
         long recordId = 0;
         switch (uriType){
             case WHOLE_TABLE:
-                smartphoneDatabase.insert(DatabaseHelper.DATABASE_NAME,null,contentValues);
+                smartphoneDatabase.insert(DatabaseHelper.SMARTPHONE_TABLE,null,contentValues);
                 smartphoneDatabase.close();
                 break;
                 default:
@@ -96,12 +94,13 @@ public class MyContentProvider extends ContentProvider {
             case WHOLE_TABLE:
                 numOfDeletedRecords = smartphoneDatabase.delete(DatabaseHelper.SMARTPHONE_TABLE,selection, selectionArgs);
                 break;
-            case CHOSEN_RAW:
+            case CHOSEN_ROW:
                 numOfDeletedRecords = smartphoneDatabase.delete(DatabaseHelper.SMARTPHONE_TABLE,getSelectionWithId(uri,selection),selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Nieprawidłowe uri: " + uri);
         }
+        getContext().getContentResolver().notifyChange(uri,null);
         return numOfDeletedRecords;
     }
 
@@ -115,7 +114,7 @@ public class MyContentProvider extends ContentProvider {
             case WHOLE_TABLE:
                 numOfUpdatedRecords = smartphoneDatabase.update(DatabaseHelper.SMARTPHONE_TABLE,contentValues,selection,selectionArgs);
                 break;
-            case CHOSEN_RAW:
+            case CHOSEN_ROW:
                 numOfUpdatedRecords = smartphoneDatabase.update(DatabaseHelper.SMARTPHONE_TABLE,contentValues,getSelectionWithId(uri,selection),selectionArgs);
                 break;
             default:
